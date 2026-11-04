@@ -46,66 +46,59 @@ export default function Contact({ prefilledService }) {
     setIsSubmitting(true);
     setSubmitResult(null);
 
-    const apiEndpoint = siteConfig.contact.apiEndpoint?.trim();
+    const isInternship = formData.service?.toLowerCase().includes('internship');
+    const subject = isInternship
+      ? `[Internship Application] ${formData.service} — ${formData.name}`
+      : `[Project Enquiry] ${formData.service} — ${formData.name} (${formData.company || 'Direct'})`;
 
-    if (apiEndpoint) {
-      // Production API Integration Point
-      try {
-        const response = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...formData,
-            submittedAt: new Date().toISOString()
-          })
-        });
+    try {
+      const endpoint = siteConfig.contact.formEndpoint || 'https://formsubmit.co/ajax/prathamatigre@gmail.com';
 
-        if (response.ok) {
-          setSubmitResult({
-            mode: 'api',
-            success: true,
-            message: 'Your project enquiry was successfully delivered to our API gateway. Our engineering team will review and reply within 24 hours.'
-          });
-          setFormData({ name: '', email: '', company: '', service: '', budget: '', message: '' });
-        } else {
-          throw new Error(`Server returned HTTP ${response.status}`);
-        }
-      } catch (err) {
-        setSubmitResult({
-          mode: 'api',
-          success: false,
-          message: `API endpoint error: ${err.message}. Please reach out directly to ${siteConfig.company.email}.`
-        });
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
-      // Working Mailto Fallback with clear, transparent user feedback
-      const isInternship = formData.service?.toLowerCase().includes('internship');
-      const subject = encodeURIComponent(
-        isInternship
-          ? `[Internship Application] ${formData.service} — ${formData.name}`
-          : `[Project Enquiry] ${formData.service} — ${formData.name} (${formData.company || 'Direct'})`
-      );
-      const body = encodeURIComponent(
-        `Name: ${formData.name}\n` +
-        `Email: ${formData.email}\n` +
-        (isInternship ? `University / Current Role: ${formData.company || 'N/A'}\n` : `Company: ${formData.company || 'N/A'}\n`) +
-        `Track / Service: ${formData.service}\n` +
-        `Budget / Status: ${formData.budget || 'Not specified'}\n\n` +
-        `Details / Portfolio:\n${formData.message}\n`
-      );
+      const payload = {
+        'Client Name': formData.name,
+        'Client Email': formData.email,
+        'Organization / College': formData.company || 'Not specified',
+        'Service / Track': formData.service,
+        'Budget / Status': formData.budget || 'Not specified',
+        'Project Brief / Notes': formData.message,
+        'Submission Timestamp': new Date().toLocaleString(),
+        '_subject': subject,
+        '_template': 'table',
+        '_captcha': 'false',
+        '_replyto': formData.email
+      };
 
-      // Trigger mailto intent
-      window.location.href = `mailto:${siteConfig.contact.recipientEmail}?subject=${subject}&body=${body}`;
-
-      setIsSubmitting(false);
-      setSubmitResult({
-        mode: 'mailto',
-        success: true,
-        message:
-          `Your email client has been prepared with your formatted enquiry directed to ${siteConfig.contact.recipientEmail}.`
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
+
+      if (response.ok) {
+        setSubmitResult({
+          success: true,
+          clientName: formData.name,
+          clientEmail: formData.email,
+          message:
+            'Thank you! Your project enquiry has been submitted directly to our engineering leadership. Our team will review your requirements and reach out to you within 24 hours.'
+        });
+        setFormData({ name: '', email: '', company: '', service: '', budget: '', message: '' });
+      } else {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || `Server status ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Submission error:', err);
+      setSubmitResult({
+        success: false,
+        message:
+          'Unable to deliver message automatically due to a network connection issue. Please check your connection or contact our team directly at info@tevraatechnologies.com.'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -243,19 +236,18 @@ export default function Contact({ prefilledService }) {
 
               {submitResult ? (
                 <div className="submission-result-panel">
-                  <div className="result-icon-box">
-                    <CheckCircle2 size={32} />
+                  <div className={`result-icon-box ${submitResult.success ? 'result-icon-success' : 'result-icon-error'}`}>
+                    {submitResult.success ? <CheckCircle2 size={36} /> : <AlertCircle size={36} />}
                   </div>
                   <h3 className="result-title">
-                    {submitResult.mode === 'api'
-                      ? 'Enquiry Dispatched'
-                      : 'Email Client Triggered'}
+                    {submitResult.success ? 'Enquiry Received Successfully' : 'Submission Notice'}
                   </h3>
                   <p className="result-text">{submitResult.message}</p>
-                  <p className="result-disclaimer">
-                    Note: If your local email client did not open automatically, please send your project notes directly to{' '}
-                    <code>{siteConfig.contact.recipientEmail}</code>.
-                  </p>
+                  {submitResult.success && submitResult.clientEmail && (
+                    <p className="result-disclaimer">
+                      A confirmation has been logged for <strong>{submitResult.clientName || 'your team'}</strong>. Our engineers will follow up directly at <code>{submitResult.clientEmail}</code>.
+                    </p>
+                  )}
                   <button
                     type="button"
                     className="btn btn-outline btn-sm"
@@ -393,18 +385,24 @@ export default function Contact({ prefilledService }) {
                       disabled={isSubmitting}
                       className="btn btn-primary btn-block submit-btn"
                     >
-                      <span>
-                        {isSubmitting
-                          ? 'Processing Submission...'
-                          : formData.service?.toLowerCase().includes('internship')
-                          ? 'Submit Internship Application'
-                          : 'Submit Project Enquiry'}
-                      </span>
-                      <ArrowUpRight size={18} />
+                      {isSubmitting ? (
+                        <>
+                          <span>Transmitting Securely...</span>
+                          <RefreshCw size={18} className="animate-spin" />
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {formData.service?.toLowerCase().includes('internship')
+                              ? 'Submit Internship Application'
+                              : 'Submit Project Enquiry'}
+                          </span>
+                          <ArrowUpRight size={18} />
+                        </>
+                      )}
                     </button>
                     <small className="form-legal-note">
-                      Submissions fall back to secure mailto transmission if no custom REST API endpoint
-                      is defined. We respect strict non-disclosure agreements.
+                      Submissions are encrypted via SSL and delivered directly to engineering leadership. We respect strict non-disclosure agreements (NDA).
                     </small>
                   </div>
                 </form>

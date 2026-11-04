@@ -37,9 +37,8 @@ export const siteConfig = {
   contact: {
     recipientEmail: 'info@tevraatechnologies.com',
     secondaryEmail: 'prathamatigre@tevraatechnologies.com',
-    // Set an API endpoint URL (e.g. '/api/contact' or 'https://api.yourcompany.com/v1/inquiries')
-    // If empty or null, the form gracefully falls back to generating a pre-filled mailto: link.
-    apiEndpoint: '',
+    notificationEmail: 'prathamatigre@gmail.com',
+    formEndpoint: 'https://formsubmit.co/ajax/prathamatigre@gmail.com',
     budgetOptions: [
       'Internship Applicant / Student',
       '< $25,000',

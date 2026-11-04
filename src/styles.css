@@ -2952,14 +2952,41 @@ svg {
 }
 
 .result-icon-box {
-  width: 56px;
-  height: 56px;
-  border: 1px solid #080808;
+  width: 64px;
+  height: 64px;
+  border: 2px solid #080808;
   border-radius: 50%;
   display: grid;
   place-items: center;
   margin: 0 auto 20px;
   color: #080808;
+  transition: all var(--transition-fast);
+}
+
+.result-icon-box.result-icon-success {
+  border-color: #00A3FF;
+  background: rgba(0, 163, 255, 0.08);
+  color: #00A3FF;
+  box-shadow: 0 0 24px rgba(0, 163, 255, 0.25);
+}
+
+.result-icon-box.result-icon-error {
+  border-color: #EF4444;
+  background: rgba(239, 68, 68, 0.08);
+  color: #EF4444;
+}
+
+@keyframes spin-linear {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin-linear 1s linear infinite;
 }
 
 .result-title {
