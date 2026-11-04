@@ -172,10 +172,12 @@ export default function Contact({ prefilledService }) {
                 <div className="contact-email-row">
                   <span className="email-type-pill">GENERAL & INQUIRIES</span>
                   <a
-                    href={`mailto:${siteConfig.company.email}?subject=Project%20Enquiry%20%E2%80%94%20Tevraa%20Technologies`}
+                    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(siteConfig.company.email)}&su=${encodeURIComponent('Project Enquiry — Tevraa Technologies')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="contact-direct-link-hero"
-                    title={`Send email to ${siteConfig.company.email}`}
-                    aria-label={`Send email to ${siteConfig.company.email}`}
+                    title={`Compose email to ${siteConfig.company.email} in Gmail`}
+                    aria-label={`Compose email to ${siteConfig.company.email} in Gmail`}
                   >
                     <span>{siteConfig.company.email}</span>
                     <ArrowUpRight size={22} className="link-arrow-icon" />
@@ -186,10 +188,12 @@ export default function Contact({ prefilledService }) {
                   <div className="contact-email-row">
                     <span className="email-type-pill email-type-pill-alt">DIRECT & LEADERSHIP</span>
                     <a
-                      href={`mailto:${siteConfig.company.secondaryEmail}?subject=Direct%20Collaboration%20%E2%80%94%20Tevraa%20Technologies`}
+                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(siteConfig.company.secondaryEmail)}&su=${encodeURIComponent('Direct Collaboration — Tevraa Technologies')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="contact-direct-link-hero secondary-link"
-                      title={`Send email to ${siteConfig.company.secondaryEmail}`}
-                      aria-label={`Send email to ${siteConfig.company.secondaryEmail}`}
+                      title={`Compose email to ${siteConfig.company.secondaryEmail} in Gmail`}
+                      aria-label={`Compose email to ${siteConfig.company.secondaryEmail} in Gmail`}
                     >
                       <span>{siteConfig.company.secondaryEmail}</span>
                       <ArrowUpRight size={20} className="link-arrow-icon" />

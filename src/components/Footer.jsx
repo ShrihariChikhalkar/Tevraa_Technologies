@@ -78,17 +78,21 @@ export default function Footer() {
             <span className="footer-col-title">COMMUNICATIONS</span>
             <div className="footer-contact-block">
               <a
-                href={`mailto:${siteConfig.company.email}?subject=Project%20Enquiry%20%E2%80%94%20Tevraa%20Technologies`}
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(siteConfig.company.email)}&su=${encodeURIComponent('Project Enquiry — Tevraa Technologies')}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="footer-email"
-                title={`Send email to ${siteConfig.company.email}`}
+                title={`Compose email to ${siteConfig.company.email} in Gmail`}
               >
                 {siteConfig.company.email}
               </a>
               {siteConfig.company.secondaryEmail && (
                 <a
-                  href={`mailto:${siteConfig.company.secondaryEmail}?subject=Direct%20Collaboration%20%E2%80%94%20Tevraa%20Technologies`}
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(siteConfig.company.secondaryEmail)}&su=${encodeURIComponent('Direct Collaboration — Tevraa Technologies')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="footer-email footer-sub-email"
-                  title={`Send email to ${siteConfig.company.secondaryEmail}`}
+                  title={`Compose email to ${siteConfig.company.secondaryEmail} in Gmail`}
                 >
                   {siteConfig.company.secondaryEmail}
                 </a>
