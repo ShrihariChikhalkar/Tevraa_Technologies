@@ -114,7 +114,6 @@ export default function Footer() {
         <div className="footer-bottom-bar">
           <span className="footer-copyright">
             © {new Date().getFullYear()} {siteConfig.company.name}. ALL RIGHTS RESERVED.
-            <span className="footer-note-tag"> [EDITABLE TEMPLATE SPECIFICATION]</span>
           </span>
 
           <a href="#home" onClick={scrollToTop} className="back-to-top-btn" aria-label="Back to top of page">
