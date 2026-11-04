@@ -77,11 +77,19 @@ export default function Footer() {
           <div className="footer-links-col">
             <span className="footer-col-title">COMMUNICATIONS</span>
             <div className="footer-contact-block">
-              <a href={`mailto:${siteConfig.company.email}`} className="footer-email">
+              <a
+                href={`mailto:${siteConfig.company.email}?subject=Project%20Enquiry%20%E2%80%94%20Tevraa%20Technologies`}
+                className="footer-email"
+                title={`Send email to ${siteConfig.company.email}`}
+              >
                 {siteConfig.company.email}
               </a>
               {siteConfig.company.secondaryEmail && (
-                <a href={`mailto:${siteConfig.company.secondaryEmail}`} className="footer-email footer-sub-email">
+                <a
+                  href={`mailto:${siteConfig.company.secondaryEmail}?subject=Direct%20Collaboration%20%E2%80%94%20Tevraa%20Technologies`}
+                  className="footer-email footer-sub-email"
+                  title={`Send email to ${siteConfig.company.secondaryEmail}`}
+                >
                   {siteConfig.company.secondaryEmail}
                 </a>
               )}
