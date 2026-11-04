@@ -56,24 +56,21 @@ export default function Contact({ prefilledService }) {
     try {
       if (accessKey) {
         // Direct background submission to prathamatigre@gmail.com via Web3Forms API
+        const formPayload = new FormData();
+        formPayload.append('access_key', accessKey);
+        formPayload.append('subject', subject);
+        formPayload.append('from_name', 'Tevraa Technologies Web');
+        formPayload.append('name', formData.name);
+        formPayload.append('email', formData.email);
+        formPayload.append('company', formData.company || 'Not specified');
+        formPayload.append('service', formData.service);
+        formPayload.append('budget', formData.budget || 'Not specified');
+        formPayload.append('message', formData.message);
+        formPayload.append('replyto', formData.email);
+
         const response = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            access_key: accessKey,
-            subject: subject,
-            from_name: 'Tevraa Technologies Web',
-            name: formData.name,
-            email: formData.email,
-            company: formData.company || 'Not specified',
-            service: formData.service,
-            budget: formData.budget || 'Not specified',
-            message: formData.message,
-            replyto: formData.email
-          })
+          body: formPayload
         });
 
         const data = await response.json();

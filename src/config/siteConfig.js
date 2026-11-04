@@ -38,8 +38,7 @@ export const siteConfig = {
     recipientEmail: 'info@tevraatechnologies.com',
     secondaryEmail: 'prathamatigre@tevraatechnologies.com',
     notificationEmail: 'prathamatigre@gmail.com',
-    // Paste your free Web3Forms access key below (from web3forms.com)
-    web3FormsAccessKey: '',
+    web3FormsAccessKey: '23409c62-e39a-4672-9c77-87c8dd441ee6',
     budgetOptions: [
       'Internship Applicant / Student',
       '< $25,000',
