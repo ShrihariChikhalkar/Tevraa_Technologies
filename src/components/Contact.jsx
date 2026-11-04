@@ -51,51 +51,85 @@ export default function Contact({ prefilledService }) {
       ? `[Internship Application] ${formData.service} — ${formData.name}`
       : `[Project Enquiry] ${formData.service} — ${formData.name} (${formData.company || 'Direct'})`;
 
+    const accessKey = siteConfig.contact.web3FormsAccessKey?.trim();
+
     try {
-      const endpoint = siteConfig.contact.formEndpoint || 'https://formsubmit.co/ajax/prathamatigre@gmail.com';
+      if (accessKey) {
+        // Direct background submission to prathamatigre@gmail.com via Web3Forms API
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            access_key: accessKey,
+            subject: subject,
+            from_name: 'Tevraa Technologies Web',
+            name: formData.name,
+            email: formData.email,
+            company: formData.company || 'Not specified',
+            service: formData.service,
+            budget: formData.budget || 'Not specified',
+            message: formData.message,
+            replyto: formData.email
+          })
+        });
 
-      const payload = {
-        'Client Name': formData.name,
-        'Client Email': formData.email,
-        'Organization / College': formData.company || 'Not specified',
-        'Service / Track': formData.service,
-        'Budget / Status': formData.budget || 'Not specified',
-        'Project Brief / Notes': formData.message,
-        'Submission Timestamp': new Date().toLocaleString(),
-        '_subject': subject,
-        '_template': 'table',
-        '_captcha': 'false',
-        '_replyto': formData.email
-      };
+        const data = await response.json();
+        if (data.success) {
+          setSubmitResult({
+            success: true,
+            clientName: formData.name,
+            clientEmail: formData.email,
+            message:
+              'Thank you! Your project enquiry has been submitted directly to our engineering leadership. Our team will review your requirements and reach out to you within 24 hours.'
+          });
+          setFormData({ name: '', email: '', company: '', service: '', budget: '', message: '' });
+          return;
+        } else {
+          throw new Error(data.message || 'API rejected submission.');
+        }
+      } else {
+        // Instant 1-click fallback prepared directly for user
+        const waMsg = encodeURIComponent(
+          `*New Enquiry via Tevraa Technologies*\n\n` +
+          `• Name: ${formData.name}\n` +
+          `• Email: ${formData.email}\n` +
+          `• Track: ${formData.service}\n` +
+          `• Organization: ${formData.company || 'N/A'}\n` +
+          `• Budget: ${formData.budget || 'Not specified'}\n\n` +
+          `*Message:*\n${formData.message}`
+        );
+        const mailtoUrl = `mailto:${siteConfig.contact.recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+          `Name: ${formData.name}\nEmail: ${formData.email}\nService: ${formData.service}\n\nMessage:\n${formData.message}`
+        )}`;
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
         setSubmitResult({
-          success: true,
+          fallback: true,
+          waUrl: `https://wa.me/918529918181?text=${waMsg}`,
+          mailtoUrl: mailtoUrl,
           clientName: formData.name,
           clientEmail: formData.email,
           message:
-            'Thank you! Your project enquiry has been submitted directly to our engineering leadership. Our team will review your requirements and reach out to you within 24 hours.'
+            'Your enquiry is prepared! You can connect with our team immediately via WhatsApp or Direct Email below:'
         });
-        setFormData({ name: '', email: '', company: '', service: '', budget: '', message: '' });
-      } else {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || `Server status ${response.status}`);
       }
     } catch (err) {
       console.error('Submission error:', err);
+      const waMsg = encodeURIComponent(
+        `*New Collaboration Enquiry via Tevraa*\n\n` +
+        `• Name: ${formData.name}\n` +
+        `• Email: ${formData.email}\n` +
+        `• Service: ${formData.service}\n\n` +
+        `Message:\n${formData.message}`
+      );
       setSubmitResult({
-        success: false,
+        fallback: true,
+        waUrl: `https://wa.me/918529918181?text=${waMsg}`,
+        mailtoUrl: `mailto:${siteConfig.contact.recipientEmail}?subject=${encodeURIComponent(subject)}`,
         message:
-          'Unable to deliver message automatically due to a network connection issue. Please check your connection or contact our team directly at info@tevraatechnologies.com.'
+          'Direct network connection was interrupted. Please send your inquiry directly via WhatsApp or Email below:'
       });
     } finally {
       setIsSubmitting(false);
@@ -236,25 +270,45 @@ export default function Contact({ prefilledService }) {
 
               {submitResult ? (
                 <div className="submission-result-panel">
-                  <div className={`result-icon-box ${submitResult.success ? 'result-icon-success' : 'result-icon-error'}`}>
-                    {submitResult.success ? <CheckCircle2 size={36} /> : <AlertCircle size={36} />}
+                  <div className={`result-icon-box ${submitResult.success ? 'result-icon-success' : 'result-icon-fallback'}`}>
+                    {submitResult.success ? <CheckCircle2 size={36} /> : <Share2 size={36} />}
                   </div>
                   <h3 className="result-title">
-                    {submitResult.success ? 'Enquiry Received Successfully' : 'Submission Notice'}
+                    {submitResult.success ? 'Enquiry Received Successfully' : 'Ready to Send'}
                   </h3>
                   <p className="result-text">{submitResult.message}</p>
                   {submitResult.success && submitResult.clientEmail && (
                     <p className="result-disclaimer">
-                      A confirmation has been logged for <strong>{submitResult.clientName || 'your team'}</strong>. Our engineers will follow up directly at <code>{submitResult.clientEmail}</code>.
+                      A confirmation ticket has been logged for <strong>{submitResult.clientName || 'your team'}</strong>. Our engineers will follow up directly at <code>{submitResult.clientEmail}</code>.
                     </p>
+                  )}
+                  {submitResult.fallback && (
+                    <div className="result-actions-row">
+                      <a
+                        href={submitResult.waUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm"
+                      >
+                        <span>Send via WhatsApp</span>
+                        <ArrowUpRight size={14} />
+                      </a>
+                      <a
+                        href={submitResult.mailtoUrl}
+                        className="btn btn-outline btn-sm"
+                      >
+                        <span>Send via Email</span>
+                        <ArrowUpRight size={14} />
+                      </a>
+                    </div>
                   )}
                   <button
                     type="button"
-                    className="btn btn-outline btn-sm"
+                    className="btn btn-ghost btn-sm mt-3"
                     onClick={handleReset}
                   >
                     <RefreshCw size={14} />
-                    <span>Submit Another Enquiry</span>
+                    <span>{submitResult.success ? 'Submit Another Enquiry' : 'Edit Information'}</span>
                   </button>
                 </div>
               ) : (

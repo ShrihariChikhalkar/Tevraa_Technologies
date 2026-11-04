@@ -2970,10 +2970,25 @@ svg {
   box-shadow: 0 0 24px rgba(0, 163, 255, 0.25);
 }
 
+.result-icon-box.result-icon-fallback {
+  border-color: #0D68F5;
+  background: rgba(13, 104, 245, 0.08);
+  color: #0D68F5;
+  box-shadow: 0 0 24px rgba(13, 104, 245, 0.25);
+}
+
 .result-icon-box.result-icon-error {
   border-color: #EF4444;
   background: rgba(239, 68, 68, 0.08);
   color: #EF4444;
+}
+
+.result-actions-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0 16px;
 }
 
 @keyframes spin-linear {
